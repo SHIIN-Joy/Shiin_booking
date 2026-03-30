@@ -284,6 +284,7 @@ export default function BookingSystem() {
     try {
       await fetch(WEBHOOK_URL, {
         method: "POST",
+        mode: "no-cors",
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({
           createdAt: booking.createdAt,
