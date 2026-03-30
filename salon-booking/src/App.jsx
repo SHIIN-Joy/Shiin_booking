@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxoVMw0OGJMrjnT1ctO89_EPmPZxSes9UlSrYPTcseUcC0X2akPSewjclqE2K_G6nL9Dg/exec";
 
 const SALON_NAME = "拾形造型";
-const SALON_EN   = "ShapeUp Studio";
+const SALON_EN   = "Shiin Studio";
 
 const SERVICES = [
   { id: 1, name: "單髮服務",                  duration: 60,  price: 1200,  deposit: 300,  icon: "✂️", note: "時長約 30–60 分鐘" },
