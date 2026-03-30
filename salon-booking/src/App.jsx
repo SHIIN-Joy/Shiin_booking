@@ -268,6 +268,7 @@ export default function BookingSystem() {
     persist(updated);
     setDone(nb);
     sendToSheet(nb);
+    go(() => setStep(4));
   };
 
   const handlePaySuccess = async (last5) => {
@@ -295,7 +296,7 @@ export default function BookingSystem() {
   const svc        = SERVICES.find(s => s.id === form.serviceId);
   const doneSvc    = done ? SERVICES.find(s => s.id === done.serviceId) : null;
   const addonTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
-  const STEP_LABELS = ["填寫資料", "同意書", "確認預約"];
+  const STEP_LABELS = ["填寫資料", "同意書", "確認預約", "完成"];
 
   const setF = (key) => (e) => setForm(p => ({ ...p, [key]: e.target.value }));
 
@@ -324,7 +325,7 @@ export default function BookingSystem() {
 
         {/* Tabs */}
         <div style={{ display: "flex", background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: 4, marginBottom: 24, border: "1px solid rgba(193,155,100,0.12)" }}>
-          {[{ key: "book", label: "確認預約" }, { key: "records", label: `預約紀錄${bookings.length ? ` (${bookings.length})` : ""}` }].map(t => (
+          {[{ key: "book", label: "預約資訊" }, { key: "records", label: `我的預約${bookings.length ? ` (${bookings.length})` : ""}` }].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{ flex: 1, padding: "11px", border: "none", borderRadius: 9, background: tab === t.key ? "linear-gradient(135deg,#c19b64,#8a6830)" : "transparent", color: tab === t.key ? "#fff" : "rgba(237,233,225,0.45)", fontSize: 13.5, cursor: "pointer", fontFamily: "inherit", letterSpacing: "0.03em", transition: "all 0.3s" }}>{t.label}</button>
           ))}
         </div>
@@ -337,7 +338,7 @@ export default function BookingSystem() {
               {STEP_LABELS.map((lbl, i) => {
                 const n = i + 1; const active = step === n; const isDone = step > n;
                 return (
-                  <div key={i} style={{ display: "flex", alignItems: "flex-start", flex: i < 2 ? 1 : "none" }}>
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", flex: i < 3 ? 1 : "none" }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: isDone ? "linear-gradient(135deg,#c19b64,#8a6830)" : active ? "rgba(193,155,100,0.18)" : "rgba(255,255,255,0.05)", border: `1.5px solid ${isDone || active ? "#c19b64" : "rgba(255,255,255,0.09)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: isDone ? "#fff" : active ? "#c19b64" : "rgba(237,233,225,0.25)", transition: "all 0.3s" }}>{isDone ? "✓" : n}</div>
                       <span style={{ fontSize: 9.5, color: active ? "#c19b64" : "rgba(237,233,225,0.28)", whiteSpace: "nowrap" }}>{lbl}</span>
@@ -542,20 +543,53 @@ export default function BookingSystem() {
                   </div>
                 </div>
               )}
+
+              {/* ── Step 4: 完成 ── */}
+              {step === 4 && (
+                <div style={{ textAlign: "center", padding: "20px 0" }}>
+                  <div style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg,rgba(193,155,100,0.22),rgba(193,155,100,0.07))", border: "2px solid #c19b64", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, margin: "0 auto 20px" }}>✓</div>
+                  <h2 style={{ fontSize: 20, fontWeight: 300, margin: "0 0 8px", letterSpacing: "0.06em" }}>預約資料已送出！</h2>
+                  <p style={{ fontSize: 13, color: "rgba(237,233,225,0.45)", margin: "0 0 24px", lineHeight: 1.7 }}>
+                    請完成匯款訂金以確保預約位置<br/>我們收到後將與您確認細節
+                  </p>
+                  <div style={{ marginBottom: 20 }}><StatusBadge status={done?.status || "pending"} /></div>
+                  <div style={{ background: "rgba(193,155,100,0.07)", border: "1px solid rgba(193,155,100,0.15)", borderRadius: 10, padding: "13px 16px", textAlign: "left", marginBottom: 20 }}>
+                    {done && [
+                      ["服務", `${doneSvc?.icon} ${doneSvc?.name}`],
+                      ["預約時間", done.datetime],
+                      ["梳化地點", done.locationType],
+                      ["姓名", done.name],
+                      ["訂金", fmtPrice(doneSvc?.deposit)],
+                    ].map(([k, v]) => (
+                      <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 13 }}>
+                        <span style={{ color: "rgba(237,233,225,0.4)" }}>{k}</span>
+                        <span style={{ color: "#ede9e1" }}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setPayTarget(done)} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg,#c19b64,#8a6830)", border: "none", borderRadius: 10, color: "#fff", fontSize: 14.5, cursor: "pointer", fontFamily: "inherit", letterSpacing: "0.05em", boxShadow: "0 4px 20px rgba(193,155,100,0.35)", marginBottom: 10 }}>
+                    🏦 查看匯款資訊
+                  </button>
+                  <button onClick={() => setTab("records")} style={{ width: "100%", padding: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 10, color: "rgba(237,233,225,0.55)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                    查看我的預約
+                  </button>
+                </div>
+              )}
+
             </div>
 
             {/* Nav */}
-            <div style={{ display: "flex", gap: 8, marginTop: 13 }}>
+            {step < 4 && <div style={{ display: "flex", gap: 8, marginTop: 13 }}>
               {step > 1 && (
                 <button onClick={goBack} style={{ padding: "13px 20px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 10, color: "rgba(237,233,225,0.55)", fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}>← 上一步</button>
               )}
               <button
                 disabled={step === 2 && !canStep2}
-                onClick={step === 1 ? handleNextStep1 : step === 2 ? handleNextStep2 : handleBook}
+                onClick={step === 1 ? handleNextStep1 : step === 2 ? handleNextStep2 : step === 3 ? handleBook : null}
                 style={{ flex: 1, padding: "13px", background: (step === 2 && !canStep2) ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg,#c19b64,#8a6830)", border: "none", borderRadius: 10, color: (step === 2 && !canStep2) ? "rgba(237,233,225,0.2)" : "#fff", fontSize: 15, cursor: (step === 2 && !canStep2) ? "not-allowed" : "pointer", fontFamily: "inherit", letterSpacing: "0.05em", transition: "all 0.3s", boxShadow: (step === 2 && !canStep2) ? "none" : "0 4px 18px rgba(193,155,100,0.3)" }}>
                 {step < 3 ? "下一步 →" : "確認預約"}
               </button>
-            </div>
+            </div>}
           </>
         )}
 
