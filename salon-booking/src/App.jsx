@@ -5,25 +5,27 @@ const SALON_NAME = "拾形造型";
 const SALON_EN   = "Shiin Studio";
 
 const SERVICES = [
-  { id: 1,  name: "單髮服務",                  price: 1200,  deposit: 300,  icon: "✂️", note: "時長約 30–60 分鐘" },
-  { id: 2,  name: "單妝服務",                  price: 1200,  deposit: 300,  icon: "💄", note: "時長約 30–60 分鐘" },
-  { id: 3,  name: "精緻妝髮（僅放髮）",        price: 2000,  deposit: 500,  icon: "✨", note: "時長約 60–90 分鐘" },
-  { id: 4,  name: "個人指定妝髮（客製化）",    price: 2200,  deposit: 550,  icon: "🎨", note: "時長約 90–120 分鐘" },
-  { id: 5,  name: "特殊妝髮（主題節慶）",      price: 3200,  deposit: 800,  icon: "🌟", note: "時長約 90–180 分鐘" },
-  { id: 6,  name: "新秘妝髮（含試妝）",        price: 10000, deposit: 2000, icon: "💍", note: "時長約 180–210 分鐘，$10,000 起" },
-  { id: 7,  name: "婚禮妝髮（新郎及親友）",    price: 1800,  deposit: 500,  icon: "💒", note: "時長約 90–180 分鐘，$1,800 起" },
-  { id: 8,  name: "兒童指定妝髮（比賽/表演）", price: 1800,  deposit: 500,  icon: "🎭", note: "時長約 90–120 分鐘" },
-  { id: 9,  name: "兒童生活妝髮（生活/活動）", price: 600,   deposit: 150,  icon: "🌈", note: "時長約 60–90 分鐘" },
+  { id: 1, name: "單髮服務",                  icon: "✂️", note: "時長約 30–60 分鐘" },
+  { id: 2, name: "單妝服務",                  icon: "💄", note: "時長約 30–60 分鐘" },
+  { id: 3, name: "精緻妝髮（僅放髮）",        icon: "✨", note: "時長約 60–90 分鐘" },
+  { id: 4, name: "個人指定妝髮（客製化）",    icon: "🎨", note: "時長約 90–120 分鐘" },
+  { id: 5, name: "特殊妝髮（主題節慶）",      icon: "🌟", note: "時長約 90–180 分鐘" },
+  { id: 6, name: "新秘妝髮（含試妝）",        icon: "💍", note: "時長約 180–210 分鐘" },
+  { id: 7, name: "婚禮妝髮（新郎及親友）",    icon: "💒", note: "時長約 90–180 分鐘" },
+  { id: 8, name: "兒童指定妝髮（比賽/表演）", icon: "🎭", note: "時長約 90–120 分鐘" },
+  { id: 9, name: "兒童生活妝髮（生活/活動）", icon: "🌈", note: "時長約 60–90 分鐘" },
 ];
 
+const DEPOSIT = 500;
+
 const ADDONS = [
-  { id: 1, name: "編髮／盤髮",         price: 350,  icon: "🪢", priceNote: "$350" },
-  { id: 2, name: "假睫毛",             price: 150,  icon: "👁️", priceNote: "$150 起" },
-  { id: 3, name: "眼型調整",           price: 150,  icon: "✦",  priceNote: "$150" },
-  { id: 4, name: "特殊妝",             price: 500,  icon: "🎭", priceNote: "$500 起" },
-  { id: 5, name: "鑽飾與造型配件黏貼", price: 150,  icon: "💎", priceNote: "$150 起" },
-  { id: 6, name: "造型飾品租借",       price: 150,  icon: "👑", priceNote: "$150 起" },
-  { id: 7, name: "假髮租借",           price: 400,  icon: "💇", priceNote: "$400 起" },
+  { id: 1, name: "編髮／盤髮",         icon: "🪢" },
+  { id: 2, name: "假睫毛",             icon: "👁️" },
+  { id: 3, name: "眼型調整",           icon: "✦"  },
+  { id: 4, name: "特殊妝",             icon: "🎭" },
+  { id: 5, name: "鑽飾與造型配件黏貼", icon: "💎" },
+  { id: 6, name: "造型飾品租借",       icon: "👑" },
+  { id: 7, name: "假髮租借",           icon: "💇" },
 ];
 
 const BANK_INFO = {
@@ -122,7 +124,7 @@ function PaymentModal({ booking, svc, onSuccess, onClose }) {
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 10, color: "rgba(237,233,225,0.38)", marginBottom: 2 }}>訂金金額</div>
-            <div style={{ fontSize: 24, fontWeight: 500, color: "#c19b64" }}>{fmtPrice(svc?.deposit)}</div>
+            <div style={{ fontSize: 24, fontWeight: 500, color: "#c19b64" }}>{fmtPrice(DEPOSIT)}</div>
           </div>
         </div>
 
@@ -220,8 +222,8 @@ export default function BookingSystem() {
           lineId:       booking.lineId,
           locationType: booking.locationType,
           address:      booking.locationType === "到府服務" ? booking.address : STUDIO_ADDRESS,
-          deposit:      fmtPrice(svc?.deposit),
-          price:        fmtPrice(svc?.price),
+          deposit:      fmtPrice(DEPOSIT),
+          price:        "（依諮詢確認）",
           status:       booking.status === "paid" ? "已確認付款" : "待確認匯款",
           last5:        booking.last5 || "",
           addons:       addonNames,
@@ -295,7 +297,7 @@ export default function BookingSystem() {
 
   const svc        = SERVICES.find(s => s.id === form.serviceId);
   const doneSvc    = done ? SERVICES.find(s => s.id === done.serviceId) : null;
-  const addonTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
+  const addonTotal = 0; // 加購不顯示價格
   const STEP_LABELS = ["填寫資料", "同意書", "確認預約", "完成"];
 
   const setF = (key) => (e) => setForm(p => ({ ...p, [key]: e.target.value }));
@@ -376,7 +378,7 @@ export default function BookingSystem() {
 
                   <div>
                     <FieldLabel label="預約時間" required />
-                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：4/5 上午 10 點" error={errors.datetime} />
+                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 上午10點" error={errors.datetime} />
                   </div>
 
                   {/* 服務項目 */}
@@ -391,9 +393,8 @@ export default function BookingSystem() {
                             <span style={{ fontSize: 18, marginRight: 11 }}>{s.icon}</span>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 13, fontWeight: sel ? 500 : 400 }}>{s.name}</div>
-                              <div style={{ fontSize: 10.5, color: "rgba(237,233,225,0.4)", marginTop: 1 }}>{s.note} · 訂金 {fmtPrice(s.deposit)}</div>
+                              <div style={{ fontSize: 10.5, color: "rgba(237,233,225,0.4)", marginTop: 1 }}>{s.note}</div>
                             </div>
-                            <div style={{ fontSize: 13.5, color: sel ? "#c19b64" : "rgba(237,233,225,0.35)", fontWeight: 500, marginLeft: 8, whiteSpace: "nowrap" }}>{fmtPrice(s.price)}</div>
                           </button>
                         );
                       })}
@@ -407,17 +408,20 @@ export default function BookingSystem() {
                       <span style={{ fontSize: 10.5, color: "rgba(237,233,225,0.3)" }}>可複選，也可略過</span>
                     </div>
                     {selectedAddons.length > 0 && (
-                      <div style={{ fontSize: 12, color: "#c19b64", marginBottom: 8 }}>已選 {selectedAddons.length} 項，加購 {fmtPrice(addonTotal)}</div>
+                      <div style={{ fontSize: 12, color: "#c19b64", marginBottom: 8 }}>已選 {selectedAddons.length} 項</div>
                     )}
-                    <div style={{ display: "grid", gap: 7 }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                       {ADDONS.map(a => {
                         const sel = !!selectedAddons.find(x => x.id === a.id);
                         return (
-                          <button key={a.id} onClick={() => toggleAddon(a)} style={{ display: "flex", alignItems: "center", padding: "10px 14px", background: sel ? "linear-gradient(135deg,rgba(193,155,100,0.18),rgba(193,155,100,0.07))" : "rgba(255,255,255,0.03)", border: `1px solid ${sel ? "#c19b64" : "rgba(255,255,255,0.07)"}`, borderRadius: 9, cursor: "pointer", color: "#ede9e1", fontFamily: "inherit", transition: "all 0.2s", textAlign: "left", width: "100%" }}>
-                            <span style={{ fontSize: 17, marginRight: 10 }}>{a.icon}</span>
-                            <div style={{ flex: 1, fontSize: 13, fontWeight: sel ? 500 : 400 }}>{a.name}</div>
-                            <span style={{ fontSize: 12.5, color: sel ? "#c19b64" : "rgba(237,233,225,0.4)", marginRight: 10 }}>{a.priceNote}</span>
-                            <div style={{ width: 17, height: 17, borderRadius: 4, background: sel ? "#c19b64" : "transparent", border: `1.5px solid ${sel ? "#c19b64" : "rgba(237,233,225,0.2)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", flexShrink: 0 }}>{sel ? "✓" : ""}</div>
+                          <button key={a.id} onClick={() => toggleAddon(a)} style={{
+                            padding: "9px 14px", border: `1px solid ${sel ? "#c19b64" : "rgba(255,255,255,0.09)"}`,
+                            borderRadius: 20, cursor: "pointer", fontFamily: "inherit", fontSize: 13, transition: "all 0.2s",
+                            background: sel ? "linear-gradient(135deg,rgba(193,155,100,0.2),rgba(193,155,100,0.08))" : "rgba(255,255,255,0.03)",
+                            color: sel ? "#c19b64" : "rgba(237,233,225,0.6)",
+                            display: "flex", alignItems: "center", gap: 5,
+                          }}>
+                            <span>{a.icon}</span> {a.name}
                           </button>
                         );
                       })}
@@ -513,8 +517,8 @@ export default function BookingSystem() {
                       ["姓名", form.name],
                       ["電話", form.phone],
                       ["LINE ID", form.lineId],
-                      ["服務費", fmtPrice(svc?.price)],
-                      ["訂金", fmtPrice(svc?.deposit)],
+                      ["服務費", "（依諮詢確認）"],
+                      ["訂金", fmtPrice(DEPOSIT)],
                     ].map(([k, v], i, arr) => (
                       <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                         <span style={{ fontSize: 11.5, color: "rgba(237,233,225,0.4)", flexShrink: 0 }}>{k}</span>
@@ -559,7 +563,7 @@ export default function BookingSystem() {
                       ["預約時間", done.datetime],
                       ["梳化地點", done.locationType],
                       ["姓名", done.name],
-                      ["訂金", fmtPrice(doneSvc?.deposit)],
+                      ["訂金", fmtPrice(DEPOSIT)],
                     ].map(([k, v]) => (
                       <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 13 }}>
                         <span style={{ color: "rgba(237,233,225,0.4)" }}>{k}</span>
@@ -607,7 +611,7 @@ export default function BookingSystem() {
                 ["預約時間", done.datetime],
                 ["梳化地點", done.locationType],
                 ["姓名", done.name],
-                ["訂金", fmtPrice(doneSvc?.deposit)],
+                ["訂金", fmtPrice(DEPOSIT)],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 13 }}>
                   <span style={{ color: "rgba(237,233,225,0.4)" }}>{k}</span>
@@ -658,7 +662,7 @@ export default function BookingSystem() {
                         <StatusBadge status={b.status} />
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px 10px", marginBottom: 9 }}>
-                        {[["姓名", b.name], ["電話", b.phone], ["LINE ID", b.lineId], b.last5 ? ["末五碼", b.last5] : ["訂金", fmtPrice(bSvc?.deposit)]].map(([k, v]) => (
+                        {[["姓名", b.name], ["電話", b.phone], ["LINE ID", b.lineId], b.last5 ? ["末五碼", b.last5] : ["訂金", fmtPrice(DEPOSIT)]].map(([k, v]) => (
                           <div key={k} style={{ fontSize: 11 }}>
                             <span style={{ color: "rgba(237,233,225,0.35)" }}>{k}：</span>
                             <span style={{ color: "rgba(237,233,225,0.7)" }}>{v}</span>
