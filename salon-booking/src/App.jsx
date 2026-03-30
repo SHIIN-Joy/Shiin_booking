@@ -376,7 +376,7 @@ export default function BookingSystem() {
 
                   <div>
                     <FieldLabel label="預約時間" required />
-                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 上午10點" error={errors.datetime} />
+                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 13:30" error={errors.datetime} />
                   </div>
 
                   {/* 服務項目 */}
