@@ -5,14 +5,15 @@ const SALON_NAME = "拾形造型";
 const SALON_EN   = "Shiin Studio";
 
 const SERVICES = [
-  { id: 1, name: "單髮服務",                  icon: "🎀", note: "時長約 30–60 分鐘" },
+  { id: 1, name: "單髮服務",                  icon: "✂️", note: "時長約 30–60 分鐘" },
   { id: 2, name: "單妝服務",                  icon: "💄", note: "時長約 30–60 分鐘" },
-  { id: 3, name: "專業妝髮（僅放髮/低馬尾）",    icon: "✨", note: "時長約 60–90 分鐘" },
-  { id: 4, name: "客製妝髮（妝+指定髮型）",    icon: "🎨", note: "時長約 90–120 分鐘" },
-  { id: 5, name: "主題妝髮（節慶）",      icon: "🎃", note: "時長約 90–180 分鐘" },
+  { id: 3, name: "精緻妝髮（僅放髮）",        icon: "✨", note: "時長約 60–90 分鐘" },
+  { id: 4, name: "個人指定妝髮（客製化）",    icon: "🎨", note: "時長約 90–120 分鐘" },
+  { id: 5, name: "特殊妝髮（主題節慶）",      icon: "🌟", note: "時長約 90–180 分鐘" },
   { id: 6, name: "新秘妝髮（含試妝）",        icon: "💍", note: "時長約 180–210 分鐘" },
   { id: 7, name: "婚禮妝髮（新郎及親友）",    icon: "💒", note: "時長約 90–180 分鐘" },
-  { id: 8, name: "兒童妝髮（比賽/活動/生活）", icon: "🌈", note: "時長約 90–120 分鐘" },
+  { id: 8, name: "兒童指定妝髮（比賽/表演）", icon: "🎭", note: "時長約 90–120 分鐘" },
+  { id: 9, name: "兒童生活妝髮（生活/活動）", icon: "🌈", note: "時長約 60–90 分鐘" },
 ];
 
 const DEPOSIT = 500;
@@ -21,9 +22,10 @@ const ADDONS = [
   { id: 1, name: "編髮／盤髮",         icon: "🪢" },
   { id: 2, name: "假睫毛",             icon: "👁️" },
   { id: 3, name: "眼型調整",           icon: "✦"  },
-  { id: 4, name: "特效道具協作",             icon: "🎭" },
-  { id: 5, name: "造型配件黏貼", icon: "💎" },
-  { id: 6, name: "租借造型飾品",       icon: "👑" },
+  { id: 4, name: "特殊妝",             icon: "🎭" },
+  { id: 5, name: "鑽飾與造型配件黏貼", icon: "💎" },
+  { id: 6, name: "造型飾品租借",       icon: "👑" },
+  { id: 7, name: "假髮租借",           icon: "💇" },
 ];
 
 const BANK_INFO = {
@@ -282,9 +284,34 @@ export default function BookingSystem() {
   };
 
   const cancelBooking = (id) => {
+    const booking = bookings.find(b => b.id === id);
     const updated = bookings.map(b => b.id === id ? { ...b, status: "cancelled" } : b);
     setBookings(updated);
     persist(updated);
+    // 通知店家
+    if (booking && WEBHOOK_URL) {
+      const svc = SERVICES.find(s => s.id === booking.serviceId);
+      fetch(WEBHOOK_URL, {
+        method: "POST", mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          createdAt:    booking.createdAt,
+          service:      svc?.name || "",
+          datetime:     booking.datetime,
+          locationType: booking.locationType,
+          address:      booking.address || "",
+          name:         booking.name,
+          phone:        booking.phone,
+          lineId:       booking.lineId,
+          addons:       (booking.addons || []).map(a => a.name).join("、"),
+          deposit:      fmtPrice(500),
+          price:        "（依諮詢確認）",
+          status:       "已取消",
+          last5:        booking.last5 || "",
+          note:         booking.note || "",
+        }),
+      }).catch(() => {});
+    }
   };
 
   const resetAll = () => {
@@ -370,13 +397,13 @@ export default function BookingSystem() {
                   </div>
 
                   <div>
-                    <FieldLabel label="LINE ID" required />
-                    <TextInput value={form.lineId} onChange={setF("lineId")} placeholder="請填寫 LINE ID" error={errors.lineId} />
+                    <FieldLabel label="LINE 用戶名稱" required />
+                    <TextInput value={form.lineId} onChange={setF("lineId")} placeholder="請填寫 LINE 上的名稱" error={errors.lineId} />
                   </div>
 
                   <div>
                     <FieldLabel label="預約時間" required />
-                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 13:30" error={errors.datetime} />
+                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 上午10點" error={errors.datetime} />
                   </div>
 
                   {/* 服務項目 */}
@@ -514,7 +541,7 @@ export default function BookingSystem() {
                       ...(form.locationType === "到府服務" ? [["到府地址", form.address]] : []),
                       ["姓名", form.name],
                       ["電話", form.phone],
-                      ["LINE ID", form.lineId],
+                      ["LINE 用戶名稱", form.lineId],
                       ["服務費", "（依諮詢確認）"],
                       ["訂金", fmtPrice(DEPOSIT)],
                     ].map(([k, v], i, arr) => (
@@ -660,7 +687,7 @@ export default function BookingSystem() {
                         <StatusBadge status={b.status} />
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px 10px", marginBottom: 9 }}>
-                        {[["姓名", b.name], ["電話", b.phone], ["LINE ID", b.lineId], b.last5 ? ["末五碼", b.last5] : ["訂金", fmtPrice(DEPOSIT)]].map(([k, v]) => (
+                        {[["姓名", b.name], ["電話", b.phone], ["LINE 用戶名稱", b.lineId], b.last5 ? ["末五碼", b.last5] : ["訂金", fmtPrice(DEPOSIT)]].map(([k, v]) => (
                           <div key={k} style={{ fontSize: 11 }}>
                             <span style={{ color: "rgba(237,233,225,0.35)" }}>{k}：</span>
                             <span style={{ color: "rgba(237,233,225,0.7)" }}>{v}</span>
@@ -669,13 +696,8 @@ export default function BookingSystem() {
                       </div>
                       {(b.addons || []).length > 0 && <div style={{ fontSize: 11, color: "#c19b64", marginBottom: 8 }}>加購：{b.addons.map(a => a.name).join("、")}</div>}
                       {b.note && <div style={{ fontSize: 11, color: "rgba(237,233,225,0.33)", fontStyle: "italic", marginBottom: 9 }}>備註：{b.note}</div>}
-                      {b.status !== "cancelled" && (
-                        <div style={{ display: "flex", gap: 7 }}>
-                          {b.status === "pending" && (
-                            <button onClick={() => setPayTarget(b)} style={{ padding: "7px 13px", background: "linear-gradient(135deg,rgba(193,155,100,0.3),rgba(138,104,48,0.3))", border: "1px solid rgba(193,155,100,0.3)", borderRadius: 7, color: "#c19b64", fontSize: 11.5, cursor: "pointer", fontFamily: "inherit" }}>🏦 匯款資訊</button>
-                          )}
-                          <button onClick={() => cancelBooking(b.id)} style={{ padding: "7px 13px", background: "rgba(200,80,80,0.08)", border: "1px solid rgba(200,80,80,0.18)", borderRadius: 7, color: "#c85050", fontSize: 11.5, cursor: "pointer", fontFamily: "inherit" }}>取消預約</button>
-                        </div>
+                      {b.status === "pending" && (
+                        <button onClick={() => setPayTarget(b)} style={{ padding: "7px 13px", background: "linear-gradient(135deg,rgba(193,155,100,0.3),rgba(138,104,48,0.3))", border: "1px solid rgba(193,155,100,0.3)", borderRadius: 7, color: "#c19b64", fontSize: 11.5, cursor: "pointer", fontFamily: "inherit" }}>🏦 匯款資訊</button>
                       )}
                     </div>
                   );
