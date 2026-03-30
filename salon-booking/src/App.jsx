@@ -7,13 +7,12 @@ const SALON_EN   = "Shiin Studio";
 const SERVICES = [
   { id: 1, name: "單髮服務",                  icon: "✂️", note: "時長約 30–60 分鐘" },
   { id: 2, name: "單妝服務",                  icon: "💄", note: "時長約 30–60 分鐘" },
-  { id: 3, name: "精緻妝髮（僅放髮）",        icon: "✨", note: "時長約 60–90 分鐘" },
-  { id: 4, name: "個人指定妝髮（客製化）",    icon: "🎨", note: "時長約 90–120 分鐘" },
-  { id: 5, name: "特殊妝髮（主題節慶）",      icon: "🌟", note: "時長約 90–180 分鐘" },
+  { id: 3, name: "專業妝髮（僅放髮/低馬尾）",        icon: "✨", note: "時長約 60–90 分鐘" },
+  { id: 4, name: "客製妝髮（妝+指定髮型）",    icon: "🎨", note: "時長約 90–120 分鐘" },
+  { id: 5, name: "主題妝髮（節慶）",      icon: "🌟", note: "時長約 90–180 分鐘" },
   { id: 6, name: "新秘妝髮（含試妝）",        icon: "💍", note: "時長約 180–210 分鐘" },
   { id: 7, name: "婚禮妝髮（新郎及親友）",    icon: "💒", note: "時長約 90–180 分鐘" },
-  { id: 8, name: "兒童指定妝髮（比賽/表演）", icon: "🎭", note: "時長約 90–120 分鐘" },
-  { id: 9, name: "兒童生活妝髮（生活/活動）", icon: "🌈", note: "時長約 60–90 分鐘" },
+  { id: 8, name: "兒童妝髮（比賽/活動/生活）", icon: "🌈", note: "時長約 90–120 分鐘" },
 ];
 
 const DEPOSIT = 500;
@@ -22,10 +21,9 @@ const ADDONS = [
   { id: 1, name: "編髮／盤髮",         icon: "🪢" },
   { id: 2, name: "假睫毛",             icon: "👁️" },
   { id: 3, name: "眼型調整",           icon: "✦"  },
-  { id: 4, name: "特殊妝",             icon: "🎭" },
-  { id: 5, name: "鑽飾與造型配件黏貼", icon: "💎" },
-  { id: 6, name: "造型飾品租借",       icon: "👑" },
-  { id: 7, name: "假髮租借",           icon: "💇" },
+  { id: 4, name: "特效道具協作",             icon: "🎭" },
+  { id: 5, name: "造型配件黏貼", icon: "💎" },
+  { id: 6, name: "租借造型飾品",       icon: "👑" },
 ];
 
 const BANK_INFO = {
@@ -403,7 +401,7 @@ export default function BookingSystem() {
 
                   <div>
                     <FieldLabel label="預約時間" required />
-                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 13:30" error={errors.datetime} />
+                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5‘中間要空格’13:30" error={errors.datetime} />
                   </div>
 
                   {/* 服務項目 */}
