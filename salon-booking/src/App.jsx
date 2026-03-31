@@ -439,7 +439,7 @@ export default function BookingSystem() {
                         width: "100%", padding: "11px 13px", background: "#faf8f5",
                         border: `1px solid ${errors.date ? "rgba(200,80,80,0.4)" : "#dedad4"}`,
                         borderRadius: 8, color: "#2c2c2c", fontSize: 14, fontFamily: "inherit",
-                        outline: "none", boxSizing: "border-box", colorScheme: "dark",
+                        outline: "none", boxSizing: "border-box", colorScheme: "light",
                       }}
                       onFocus={e => e.target.style.borderColor = "#2c2c2c"}
                       onBlur={e => e.target.style.borderColor = errors.date ? "rgba(200,80,80,0.4)" : "#dedad4"}
@@ -457,7 +457,7 @@ export default function BookingSystem() {
                         border: `1px solid ${errors.time ? "rgba(200,80,80,0.4)" : "#dedad4"}`,
                         borderRadius: 8, color: form.time ? "#2c2c2c" : "rgba(44,44,44,0.35)",
                         fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box",
-                        colorScheme: "dark", cursor: "pointer",
+                        colorScheme: "light", cursor: "pointer",
                       }}
                       onFocus={e => e.target.style.borderColor = "#2c2c2c"}
                       onBlur={e => e.target.style.borderColor = errors.time ? "rgba(200,80,80,0.4)" : "#dedad4"}
