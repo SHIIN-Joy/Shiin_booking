@@ -432,6 +432,13 @@ export default function BookingSystem() {
                   <div>
                     <FieldLabel label="預約日期" required />
                     {errors.date && <div style={{ color: "#e07070", fontSize: 11.5, marginBottom: 6 }}>{errors.date}</div>}
+                    <div style={{ position: "relative" }}>
+                      {!form.date && (
+                        <div style={{
+                          position: "absolute", top: "50%", left: 13, transform: "translateY(-50%)",
+                          color: "rgba(44,44,44,0.35)", fontSize: 14, pointerEvents: "none", zIndex: 1,
+                        }}>請選擇日期 📅</div>
+                      )}
                     <input type="date" value={form.date}
                       onChange={e => { setForm(p => ({ ...p, date: e.target.value })); setErrors(p => ({ ...p, date: undefined })); }}
                       min={new Date().toISOString().split("T")[0]}
@@ -444,6 +451,7 @@ export default function BookingSystem() {
                       onFocus={e => e.target.style.borderColor = "#2c2c2c"}
                       onBlur={e => e.target.style.borderColor = errors.date ? "rgba(200,80,80,0.4)" : "#dedad4"}
                     />
+                    </div>
                   </div>
 
                   {/* 預約時段 */}
