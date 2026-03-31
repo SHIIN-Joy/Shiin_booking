@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxoVMw0OGJMrjnT1ctO89_EPmPZxSes9UlSrYPTcseUcC0X2akPSewjclqE2K_G6nL9Dg/exec";
 const SALON_NAME = "拾形造型";
-const SALON_EN   = "ShapeUp Studio";
+const SALON_EN   = "Shiin Studio";
 
 const SERVICES = [
   { id: 1, name: "單髮服務",                  icon: "✂️", note: "時長約 30–60 分鐘" },
@@ -428,9 +428,45 @@ export default function BookingSystem() {
                     <TextInput value={form.lineId} onChange={setF("lineId")} placeholder="請填寫 LINE 上的名稱" error={errors.lineId} />
                   </div>
 
+                  {/* 預約日期 */}
                   <div>
-                    <FieldLabel label="預約時間" required />
-                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 上午10點" error={errors.datetime} />
+                    <FieldLabel label="預約日期" required />
+                    {errors.date && <div style={{ color: "#e07070", fontSize: 11.5, marginBottom: 6 }}>{errors.date}</div>}
+                    <input type="date" value={form.date}
+                      onChange={e => { setForm(p => ({ ...p, date: e.target.value })); setErrors(p => ({ ...p, date: undefined })); }}
+                      min={new Date().toISOString().split("T")[0]}
+                      style={{
+                        width: "100%", padding: "11px 13px", background: "rgba(255,255,255,0.04)",
+                        border: `1px solid ${errors.date ? "rgba(200,80,80,0.4)" : "rgba(255,255,255,0.09)"}`,
+                        borderRadius: 8, color: "#ede9e1", fontSize: 14, fontFamily: "inherit",
+                        outline: "none", boxSizing: "border-box", colorScheme: "dark",
+                      }}
+                      onFocus={e => e.target.style.borderColor = "#c19b64"}
+                      onBlur={e => e.target.style.borderColor = errors.date ? "rgba(200,80,80,0.4)" : "rgba(255,255,255,0.09)"}
+                    />
+                  </div>
+
+                  {/* 預約時段 */}
+                  <div>
+                    <FieldLabel label="預約時段" required />
+                    {errors.time && <div style={{ color: "#e07070", fontSize: 11.5, marginBottom: 6 }}>{errors.time}</div>}
+                    <select value={form.time}
+                      onChange={e => { setForm(p => ({ ...p, time: e.target.value })); setErrors(p => ({ ...p, time: undefined })); }}
+                      style={{
+                        width: "100%", padding: "11px 13px", background: "rgba(255,255,255,0.04)",
+                        border: `1px solid ${errors.time ? "rgba(200,80,80,0.4)" : "rgba(255,255,255,0.09)"}`,
+                        borderRadius: 8, color: form.time ? "#ede9e1" : "rgba(237,233,225,0.35)",
+                        fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box",
+                        colorScheme: "dark", cursor: "pointer",
+                      }}
+                      onFocus={e => e.target.style.borderColor = "#c19b64"}
+                      onBlur={e => e.target.style.borderColor = errors.time ? "rgba(200,80,80,0.4)" : "rgba(255,255,255,0.09)"}
+                    >
+                      <option value="" disabled>請選擇時段</option>
+                      {TIME_SLOTS_LIST.map(t => (
+                        <option key={t} value={t} style={{ background: "#1a1a2e" }}>{t}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* 服務項目 */}
