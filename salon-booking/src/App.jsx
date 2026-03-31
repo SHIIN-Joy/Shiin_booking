@@ -2,17 +2,18 @@ import { useState, useEffect } from "react";
 
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxoVMw0OGJMrjnT1ctO89_EPmPZxSes9UlSrYPTcseUcC0X2akPSewjclqE2K_G6nL9Dg/exec";
 const SALON_NAME = "拾形造型";
-const SALON_EN   = "Shiin Studio";
+const SALON_EN   = "ShapeUp Studio";
 
 const SERVICES = [
   { id: 1, name: "單髮服務",                  icon: "✂️", note: "時長約 30–60 分鐘" },
   { id: 2, name: "單妝服務",                  icon: "💄", note: "時長約 30–60 分鐘" },
-  { id: 3, name: "專業妝髮（僅放髮/低馬尾）",        icon: "✨", note: "時長約 60–90 分鐘" },
-  { id: 4, name: "客製妝髮（妝+指定髮型）",    icon: "🎨", note: "時長約 90–120 分鐘" },
-  { id: 5, name: "主題妝髮（節慶）",      icon: "🌟", note: "時長約 90–180 分鐘" },
+  { id: 3, name: "精緻妝髮（僅放髮）",        icon: "✨", note: "時長約 60–90 分鐘" },
+  { id: 4, name: "個人指定妝髮（客製化）",    icon: "🎨", note: "時長約 90–120 分鐘" },
+  { id: 5, name: "特殊妝髮（主題節慶）",      icon: "🌟", note: "時長約 90–180 分鐘" },
   { id: 6, name: "新秘妝髮（含試妝）",        icon: "💍", note: "時長約 180–210 分鐘" },
   { id: 7, name: "婚禮妝髮（新郎及親友）",    icon: "💒", note: "時長約 90–180 分鐘" },
-  { id: 8, name: "兒童妝髮（比賽/活動/生活）", icon: "🌈", note: "時長約 90–120 分鐘" },
+  { id: 8, name: "兒童指定妝髮（比賽/表演）", icon: "🎭", note: "時長約 90–120 分鐘" },
+  { id: 9, name: "兒童生活妝髮（生活/活動）", icon: "🌈", note: "時長約 60–90 分鐘" },
 ];
 
 const DEPOSIT = 500;
@@ -21,9 +22,16 @@ const ADDONS = [
   { id: 1, name: "編髮／盤髮",         icon: "🪢" },
   { id: 2, name: "假睫毛",             icon: "👁️" },
   { id: 3, name: "眼型調整",           icon: "✦"  },
-  { id: 4, name: "特效道具協作",             icon: "🎭" },
-  { id: 5, name: "造型配件黏貼", icon: "💎" },
-  { id: 6, name: "租借造型飾品",       icon: "👑" },
+  { id: 4, name: "特殊妝",             icon: "🎭" },
+  { id: 5, name: "鑽飾與造型配件黏貼", icon: "💎" },
+  { id: 6, name: "造型飾品租借",       icon: "👑" },
+  { id: 7, name: "假髮租借",           icon: "💇" },
+];
+
+const GENDERS = ["男", "女"];
+
+const TIME_SLOTS_LIST = [
+  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30"
 ];
 
 const BANK_INFO = {
@@ -214,7 +222,8 @@ export default function BookingSystem() {
         body: JSON.stringify({
           createdAt:    booking.createdAt,
           service:      svc?.name || "",
-          datetime:     booking.datetime,
+          datetime:     booking.date + ' ' + booking.time,
+          gender:       booking.gender || "",
           name:         booking.name,
           phone:        booking.phone,
           lineId:       booking.lineId,
@@ -238,7 +247,9 @@ export default function BookingSystem() {
     if (!form.name.trim())                               e.name = "請填寫姓名";
     if (form.phone.replace(/\D/g,"").length < 8)         e.phone = "請填寫有效電話";
     if (!form.lineId.trim())                             e.lineId = "請填寫 LINE ID";
-    if (!form.datetime.trim())                           e.datetime = "請填寫預約時間";
+    if (!form.date)                                      e.date = "請選擇預約日期";
+    if (!form.time)                                      e.time = "請選擇預約時段";
+    if (!form.gender)                                    e.gender = "請選擇性別";
     if (!form.serviceId)                                 e.serviceId = "請選擇服務項目";
     if (!form.locationType)                              e.locationType = "請選擇梳化地點";
     if (form.locationType === "到府服務" && !form.address.trim()) e.address = "請填寫到府地址";
@@ -259,6 +270,7 @@ export default function BookingSystem() {
   const handleBook = () => {
     const nb = {
       id: Date.now(), ...form,
+      datetime: form.date + " " + form.time,
       addons: selectedAddons,
       status: "pending",
       createdAt: new Date().toLocaleString("zh-TW"),
@@ -295,9 +307,10 @@ export default function BookingSystem() {
         body: JSON.stringify({
           createdAt:    booking.createdAt,
           service:      svc?.name || "",
-          datetime:     booking.datetime,
+          datetime:     booking.date + ' ' + booking.time,
           locationType: booking.locationType,
           address:      booking.address || "",
+          gender:       booking.gender || "",
           name:         booking.name,
           phone:        booking.phone,
           lineId:       booking.lineId,
@@ -313,7 +326,7 @@ export default function BookingSystem() {
   };
 
   const resetAll = () => {
-    setForm({ name: "", phone: "", lineId: "", datetime: "", serviceId: null, locationType: "", address: "", note: "" });
+    setForm({ name: "", phone: "", lineId: "", date: "", time: "", datetime: "", gender: "", serviceId: null, locationType: "", address: "", note: "" });
     setSelectedAddons([]); setConsents({ privacy: false, portrait: false });
     setErrors({}); setStep(1); setDone(null); setTab("book");
   };
@@ -394,6 +407,22 @@ export default function BookingSystem() {
                     </div>
                   </div>
 
+                  {/* 性別 */}
+                  <div>
+                    <FieldLabel label="性別" required />
+                    {errors.gender && <div style={{ color: "#e07070", fontSize: 11.5, marginBottom: 6 }}>{errors.gender}</div>}
+                    <div style={{ display: "flex", gap: 10 }}>
+                      {GENDERS.map(g => (
+                        <button key={g} onClick={() => { setForm(p => ({ ...p, gender: g })); setErrors(p => ({ ...p, gender: undefined })); }} style={{
+                          flex: 1, padding: "11px 8px", border: `1px solid ${form.gender === g ? "#c19b64" : "rgba(255,255,255,0.09)"}`,
+                          borderRadius: 9, cursor: "pointer", fontFamily: "inherit", fontSize: 13.5, transition: "all 0.2s",
+                          background: form.gender === g ? "linear-gradient(135deg,rgba(193,155,100,0.2),rgba(193,155,100,0.08))" : "rgba(255,255,255,0.03)",
+                          color: form.gender === g ? "#c19b64" : "rgba(237,233,225,0.5)",
+                        }}>{g}</button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <FieldLabel label="LINE 用戶名稱" required />
                     <TextInput value={form.lineId} onChange={setF("lineId")} placeholder="請填寫 LINE 上的名稱" error={errors.lineId} />
@@ -401,7 +430,7 @@ export default function BookingSystem() {
 
                   <div>
                     <FieldLabel label="預約時間" required />
-                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5‘中間要空格’13:30" error={errors.datetime} />
+                    <TextInput value={form.datetime} onChange={setF("datetime")} placeholder="例：2026/4/5 上午10點" error={errors.datetime} />
                   </div>
 
                   {/* 服務項目 */}
@@ -534,7 +563,9 @@ export default function BookingSystem() {
                   <div style={{ background: "rgba(193,155,100,0.07)", border: "1px solid rgba(193,155,100,0.15)", borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
                     {[
                       ["服務", `${svc?.icon} ${svc?.name}`],
-                      ["預約時間", form.datetime],
+                      ["性別", form.gender],
+                      ["預約日期", form.date],
+                      ["預約時段", form.time],
                       ["梳化地點", form.locationType],
                       ...(form.locationType === "到府服務" ? [["到府地址", form.address]] : []),
                       ["姓名", form.name],
@@ -583,7 +614,7 @@ export default function BookingSystem() {
                   <div style={{ background: "rgba(193,155,100,0.07)", border: "1px solid rgba(193,155,100,0.15)", borderRadius: 10, padding: "13px 16px", textAlign: "left", marginBottom: 20 }}>
                     {done && [
                       ["服務", `${doneSvc?.icon} ${doneSvc?.name}`],
-                      ["預約時間", done.datetime],
+                      ["預約日期", done.date + " " + done.time],
                       ["梳化地點", done.locationType],
                       ["姓名", done.name],
                       ["訂金", fmtPrice(DEPOSIT)],
@@ -631,7 +662,7 @@ export default function BookingSystem() {
             <div style={{ background: "rgba(193,155,100,0.07)", border: "1px solid rgba(193,155,100,0.15)", borderRadius: 10, padding: "13px 16px", textAlign: "left", marginBottom: 20 }}>
               {[
                 ["服務", `${doneSvc?.icon} ${doneSvc?.name}`],
-                ["預約時間", done.datetime],
+                ["預約日期", done.date + " " + done.time],
                 ["梳化地點", done.locationType],
                 ["姓名", done.name],
                 ["訂金", fmtPrice(DEPOSIT)],
@@ -680,7 +711,7 @@ export default function BookingSystem() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 9 }}>
                         <div>
                           <div style={{ fontSize: 14, fontWeight: 500 }}>{bSvc?.icon} {bSvc?.name}</div>
-                          <div style={{ fontSize: 11, color: "rgba(237,233,225,0.4)", marginTop: 1 }}>{b.datetime} · {b.locationType}</div>
+                          <div style={{ fontSize: 11, color: "rgba(237,233,225,0.4)", marginTop: 1 }}>{b.date} {b.time} · {b.locationType}</div>
                         </div>
                         <StatusBadge status={b.status} />
                       </div>
